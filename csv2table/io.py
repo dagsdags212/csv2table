@@ -10,8 +10,14 @@ def read_csv(filepath: str | Path) -> pl.DataFrame:
     return pl.read_csv(filepath)
 
 
-def save_table(tbl: GT, outpath: str | Path) -> None:
-    outpath = _validate_filepath(outpath)
+def save_table(tbl: GT, outpath: str | Path, **kwargs) -> None:
+    if isinstance(outpath, str):
+        outpath = Path(outpath)
+
+    options = {"encoding": "utf-8"}
+    if "scale" in kwargs:
+        options.update({"scale": kwargs["scale"]})
+
     # TODO: assert path extension is valid
     print(f"Saving to {outpath} as a {outpath.stem} file")
-    tbl.save(outpath)
+    tbl.save(outpath, **options)
