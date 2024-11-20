@@ -2,8 +2,22 @@ import polars as pl
 from great_tables import GT
 
 
+def clean_headers(headers: list[str]) -> list[str]:
+    """Replaces word delimiters with whitespaces and sets casing to title."""
+
+    def convert_to_whitespace(s: str):
+        for delim in ["_", "-", "|", ",", "."]:
+            s = s.replace(delim, " ")
+        return s
+
+    spaced_header = map(convert_to_whitespace, headers)
+    title_case = map(str.title, spaced_header)
+    return list(title_case)
+
+
 def tabulate(data: pl.DataFrame, **kwargs):
     """Convert DataFrame into a GreatTable object."""
+    data.columns = clean_headers(data.columns)
     tbl = GT(data)
     if "title" in kwargs and "subtitle" in kwargs:
         tbl = tbl.tab_header(title=kwargs["title"], subtitle=kwargs["subtitle"])
