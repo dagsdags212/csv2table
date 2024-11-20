@@ -40,7 +40,7 @@ def view(filepath, start, end, head, tail) -> None:
         with pl.Config(tbl_rows=10):
             print(df.tail(10))
             return
-    
+
     if start or end:
         # deal with empty values
         match (start, end):
@@ -53,7 +53,7 @@ def view(filepath, start, end, head, tail) -> None:
         assert start >= 0 and start < nrows, f"start must be between 0 and {nrows}"
         assert end > 0 and end < nrows, f"end must be between 1 and {nrows}"
         # display the subsetted data
-        with pl.Config(tbl_rows=end-start):
+        with pl.Config(tbl_rows=end - start):
             subset = filter_df_by_row_index(df, start, end)
             print(subset)
             return

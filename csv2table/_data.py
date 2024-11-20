@@ -9,6 +9,7 @@ def fetch_sample_csv() -> str:
     r.raise_for_status()
     return r.text
 
+
 def write_to_tmp(s: str) -> Path:
     """Writes a string to a temporary file and returns its path."""
     outfile = Path("/tmp/sample.csv")

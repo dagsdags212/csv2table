@@ -15,4 +15,3 @@ def save_table(tbl: GT, outpath: str | Path) -> None:
     # TODO: assert path extension is valid
     print(f"Saving to {outpath} as a {outpath.stem} file")
     tbl.save(outpath)
-

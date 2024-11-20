@@ -29,7 +29,7 @@ class TestHelpers(unittest.TestCase):
         start, end = 20, None
         df = filter_df_by_row_index(self.df, start, end)
         self.assertIsInstance(df, pl.DataFrame)
-        self.assertEqual(df.shape[0], self.df.shape[0]-start)
+        self.assertEqual(df.shape[0], self.df.shape[0] - start)
 
     def test_filter_rows_with_invalid_indices(self):
         """Expected to raise an IndexError."""
