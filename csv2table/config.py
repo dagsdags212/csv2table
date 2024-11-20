@@ -1,1 +1,3 @@
 SPAN = 10
+SCALE = 3.0
+HIGHLIGHT_COLOR = "aliceblue"
