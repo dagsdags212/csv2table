@@ -1,13 +1,10 @@
 from pathlib import Path
-from typing import Optional
 import click
 import polars as pl
-from great_tables import GT
-from csv2table.validation import _validate_filepath
 from csv2table.io import read_csv, save_table
 from csv2table.formatter import tabulate
 from csv2table.helpers import filter_df_by_row_index
-from csv2table.config import SPAN
+from csv2table.config import SPAN, SCALE
 
 
 @click.group()
@@ -24,8 +21,10 @@ def main():
 @click.option("--tail", is_flag=True, help="display last 10 rows")
 def view(filepath, start, end, head, tail) -> None:
     """Writes rows of a tabulated csv file to stdout."""
+    filepath = Path(filepath).absolute()
     df = read_csv(filepath)
     nrows, _ = df.shape
+
     if head and tail:
         raise ValueError(
             "cannot pass both `--head` and `--tail` flags at the same time"
@@ -63,17 +62,17 @@ def view(filepath, start, end, head, tail) -> None:
 
 @click.command(help="convert csv into a table")
 @click.argument("filepath")
-@click.option("-o", "--outfile", required=True, type=str, help="output file name")
+@click.option("-o", "--outfile", required=True, type=Path, help="output file name")
 @click.option("--title", type=str, default=None, help="include a table title")
 @click.option("--subtitle", type=str, default=None, help="include a table subtitle")
 @click.option("--footer", type=str, default=None, help="include a table footer")
-def convert(filepath, outfile, title, subtitle, footer):
+def export(filepath, outfile, title, subtitle, footer):
     df = read_csv(filepath)
     ACCEPTED_EXTS = ["png", "bmp", "pdf"]
     # generate path to output
-    ext = outfile.split(".")[-1]
-    if ext not in ACCEPTED_EXTS:
+    if outfile.suffix[1:] not in ACCEPTED_EXTS:
         raise ValueError("invalid file extension (must be .png, .mbp, or .pdf)")
+
     # add optional table fields
     kwargs = {}
     if title:
@@ -82,19 +81,13 @@ def convert(filepath, outfile, title, subtitle, footer):
         kwargs.update(dict(subtitle=subtitle))
     if footer:
         kwargs.update(dict(footer=footer))
+
     tbl = tabulate(df, **kwargs)
-    try:
-        print(f"Saving to {outfile}")
-        tbl.show(target="browser")
-        return
-    except Exception as err:
-        raise err
-    finally:
-        print(f"Table has been saved to {outfile}")
+    save_table(tbl, outfile.absolute(), scale=SCALE)
 
 
 main.add_command(view)
-main.add_command(convert)
+main.add_command(export)
 
 if __name__ == "__main__":
     main()
